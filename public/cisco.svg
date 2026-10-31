@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <path fill="#049FD9" d="M14 68c2.2 0 4-1.8 4-4V56c0-2.2-1.8-4-4-4s-4 1.8-4 4v8c0 2.2 1.8 4 4 4zm16 12c2.2 0 4-1.8 4-4V44c0-2.2-1.8-4-4-4s-4 1.8-4 4v32c0 2.2 1.8 4 4 4zm17 0c2.2 0 4-1.8 4-4V56c0-2.2-1.8-4-4-4s-4 1.8-4 4v20c0 2.2 1.8 4 4 4zm17 12c2.2 0 4-1.8 4-4V32c0-2.2-1.8-4-4-4s-4 1.8-4 4v44c0 2.2 1.8 4 4 4zm17-12c2.2 0 4-1.8 4-4V56c0-2.2-1.8-4-4-4s-4 1.8-4 4v20c0 2.2 1.8 4 4 4zm17 0c2.2 0 4-1.8 4-4V44c0-2.2-1.8-4-4-4s-4 1.8-4 4v32c0 2.2 1.8 4 4 4zm16-12c2.2 0 4-1.8 4-4V56c0-2.2-1.8-4-4-4s-4 1.8-4 4v8c0 2.2 1.8 4 4 4z"/>
+  <text x="64" y="112" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="bold" fill="#049FD9" text-anchor="middle" letter-spacing="1">CISCO</text>
+</svg>
+

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="sql-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00758F"/>
+      <stop offset="100%" stop-color="#F29111"/>
+    </linearGradient>
+  </defs>
+  <!-- Database cylinder structure -->
+  <path fill="#00758F" d="M64 12C37.5 12 16 19.2 16 28v72c0 8.8 21.5 16 48 16s48-7.2 48-16V28c0-8.8-21.5-16-48-16zm36 28.5c-7.3 4.2-20.7 7.5-36 7.5s-28.7-3.3-36-7.5V33c7.8 4.3 21 7 36 7s28.2-2.7 36-7v7.5zm0 24c-7.3 4.2-20.7 7.5-36 7.5s-28.7-3.3-36-7.5V57c7.8 4.3 21 7 36 7s28.2-2.7 36-7v7.5zm0 24c-7.3 4.2-20.7 7.5-36 7.5s-28.7-3.3-36-7.5V81c7.8 4.3 21 7 36 7s28.2-2.7 36-7v7.5zM64 24c-22.1 0-36-5.4-36-8s13.9-8 36-8 36 5.4 36 8-13.9 8-36 8z"/>
+  <rect x="22" y="52" width="84" height="26" rx="6" fill="#F29111" opacity="0.9"/>
+  <text x="64" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">SQL</text>
+</svg>
+
