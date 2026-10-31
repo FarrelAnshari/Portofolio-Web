@@ -225,6 +225,20 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
     );
 });
 
+// Detect if Supabase is configured with real credentials
+const isSupabaseConfigured = () => {
+    const url = import.meta.env.VITE_SUPABASE_URL || '';
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+    return (
+        url.length > 0 &&
+        !url.includes('placeholder') &&
+        key.length > 0 &&
+        !key.includes('placeholder')
+    );
+};
+
+const SUPABASE_READY = isSupabaseConfigured();
+
 const Komentar = () => {
     const [comments, setComments] = useState([]);
     const [pinnedComment, setPinnedComment] = useState(null);
@@ -329,12 +343,28 @@ const Komentar = () => {
 
     const handleCommentSubmit = useCallback(async ({ newComment, userName, imageFile }) => {
         setError('');
+
+        // Guard: Supabase not configured yet
+        if (!SUPABASE_READY) {
+            setError('Fitur komentar belum aktif. Database Supabase belum dikonfigurasi. Silakan hubungi pemilik website.');
+            return;
+        }
+
+        // Validate inputs
+        if (!userName.trim() || !newComment.trim()) {
+            setError('Name dan Message wajib diisi sebelum mengirim komentar.');
+            return;
+        }
+
         setIsSubmitting(true);
         
         try {
-            const profileImageUrl = await uploadImage(imageFile);
+            let profileImageUrl = null;
+            if (imageFile) {
+                profileImageUrl = await uploadImage(imageFile);
+            }
             
-            const { error } = await supabase
+            const { error: insertError } = await supabase
                 .from('portfolio_comments')
                 .insert([
                     {
@@ -346,12 +376,22 @@ const Komentar = () => {
                     }
                 ]);
 
-            if (error) {
-                throw error;
+            if (insertError) {
+                if (insertError.code === '42501' || (insertError.message && insertError.message.includes('permission'))) {
+                    setError('Gagal: Akses database ditolak. Periksa pengaturan Row Level Security (RLS) di Supabase.');
+                } else if (insertError.code === '23502') {
+                    setError('Gagal: Kolom wajib belum terisi. Pastikan Name dan Message sudah diisi.');
+                } else {
+                    setError('Gagal mengirim komentar: ' + (insertError.message || 'Terjadi kesalahan. Coba lagi.'));
+                }
+                console.error('Supabase insert error:', insertError);
+                return;
             }
-        } catch (error) {
-            setError('Failed to post comment. Please try again.');
-            console.error('Error adding comment: ', error);
+
+            // Success — CommentForm clears its own fields via its handleSubmit
+        } catch (err) {
+            setError('Gagal mengirim komentar. Periksa koneksi internet Anda dan coba lagi.');
+            console.error('Error adding comment: ', err);
         } finally {
             setIsSubmitting(false);
         }
