@@ -279,9 +279,9 @@ const Komentar = () => {
         fetchPinnedComment();
     }, []);
 
-    // Fetch regular comments (excluding pinned) and set up real-time subscription
-    useEffect(() => {
-        const fetchComments = async () => {
+    // Fetch regular comments (excluding pinned)
+    const fetchComments = useCallback(async () => {
+        try {
             const { data, error } = await supabase
                 .from('portfolio_comments')
                 .select('*')
@@ -294,8 +294,12 @@ const Komentar = () => {
             }
             
             setComments(data || []);
-        };
+        } catch (err) {
+            console.error('Error fetching comments:', err);
+        }
+    }, []);
 
+    useEffect(() => {
         fetchComments();
 
         // Set up real-time subscription
@@ -317,7 +321,7 @@ const Komentar = () => {
         return () => {
             subscription.unsubscribe();
         };
-    }, []);
+    }, [fetchComments]);
 
     const uploadImage = useCallback(async (imageFile) => {
         if (!imageFile) return null;
@@ -364,17 +368,18 @@ const Komentar = () => {
                 profileImageUrl = await uploadImage(imageFile);
             }
             
-            const { error: insertError } = await supabase
+            const newCommentPayload = {
+                content: newComment,
+                user_name: userName,
+                profile_image: profileImageUrl,
+                is_pinned: false,
+                created_at: new Date().toISOString()
+            };
+
+            const { data: insertedData, error: insertError } = await supabase
                 .from('portfolio_comments')
-                .insert([
-                    {
-                        content: newComment,
-                        user_name: userName,
-                        profile_image: profileImageUrl,
-                        is_pinned: false,
-                        created_at: new Date().toISOString()
-                    }
-                ]);
+                .insert([newCommentPayload])
+                .select();
 
             if (insertError) {
                 if (insertError.code === '42501' || (insertError.message && insertError.message.includes('permission'))) {
@@ -388,14 +393,19 @@ const Komentar = () => {
                 return;
             }
 
-            // Success — CommentForm clears its own fields via its handleSubmit
+            // Update comments state immediately so it appears instantly without refresh
+            if (insertedData && insertedData.length > 0) {
+                setComments(prev => [insertedData[0], ...prev.filter(c => c.id !== insertedData[0].id)]);
+            } else {
+                await fetchComments();
+            }
         } catch (err) {
             setError('Gagal mengirim komentar. Periksa koneksi internet Anda dan coba lagi.');
             console.error('Error adding comment: ', err);
         } finally {
             setIsSubmitting(false);
         }
-    }, [uploadImage]);
+    }, [uploadImage, fetchComments]);
 
     const formatDate = useCallback((timestamp) => {
         if (!timestamp) return '';
