@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const Portofolio = lazy(() => import("./Pages/Portofolio"));
 const ContactPage = lazy(() => import("./Pages/Contact"));
+const Education = lazy(() => import("./components/Education"));
 const ProjectDetails = lazy(() => import("./components/ProjectDetail"));
 const WelcomeScreen = lazy(() => import("./Pages/WelcomeScreen"));
 const NotFoundPage = lazy(() => import("./Pages/404"));
@@ -38,6 +39,7 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
           <About />
           <Suspense fallback={<div className="h-20" />}>
             <Portofolio />
+            <Education />
             <ContactPage />
           </Suspense>
           <Footer />
@@ -109,3 +111,4 @@ function App() {
 }
 
 export default App;
+

@@ -10,45 +10,50 @@ const Navbar = () => {
         { href: "#Home", label: "Home" },
         { href: "#About", label: "About" },
         { href: "#Portofolio", label: "Portofolio" },
+        { href: "#Education", label: "Pendidikan" },
         { href: "#Contact", label: "Contact" },
     ];
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
-            const sections = navItems.map(item => {
+
+            // Check if user has scrolled near bottom of page
+            const isNearBottom =
+                window.innerHeight + window.scrollY >=
+                document.documentElement.scrollHeight - 100;
+            if (isNearBottom) {
+                setActiveSection("Contact");
+                return;
+            }
+
+            // Target scroll position with navbar offset
+            const scrollPosition = window.scrollY + 140;
+
+            for (let i = navItems.length - 1; i >= 0; i--) {
+                const item = navItems[i];
                 const section = document.querySelector(item.href);
                 if (section) {
-                    return {
-                        id: item.href.replace("#", ""),
-                        offset: section.offsetTop - 550,
-                        height: section.offsetHeight
-                    };
+                    const sectionTop =
+                        section.getBoundingClientRect().top + window.scrollY;
+                    if (scrollPosition >= sectionTop) {
+                        setActiveSection(item.href.replace("#", ""));
+                        break;
+                    }
                 }
-                return null;
-            }).filter(Boolean);
-
-            const currentPosition = window.scrollY;
-            const active = sections.find(section => 
-                currentPosition >= section.offset && 
-                currentPosition < section.offset + section.height
-            );
-
-            if (active) {
-                setActiveSection(active.id);
             }
         };
 
-        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("scroll", handleScroll, { passive: true });
         handleScroll();
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
     useEffect(() => {
         if (isOpen) {
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = "hidden";
         } else {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
         }
     }, [isOpen]);
 
@@ -56,11 +61,16 @@ const Navbar = () => {
         e.preventDefault();
         const section = document.querySelector(href);
         if (section) {
-            const top = section.offsetTop - 100;
+            const navbarOffset = 70;
+            const elementPosition =
+                section.getBoundingClientRect().top + window.scrollY;
+            const offsetPosition = elementPosition - navbarOffset;
+
             window.scrollTo({
-                top: top,
-                behavior: "smooth"
+                top: offsetPosition,
+                behavior: "smooth",
             });
+            setActiveSection(href.replace("#", ""));
         }
         setIsOpen(false);
     };
@@ -71,7 +81,7 @@ const Navbar = () => {
                 isOpen
                     ? "bg-[#030014]"
                     : scrolled
-                    ? "bg-[#030014]/50 backdrop-blur-xl"
+                    ? "bg-[#030014]/70 backdrop-blur-xl border-b border-white/[0.06] shadow-lg shadow-black/20"
                     : "bg-transparent"
             }`}
         >
@@ -82,7 +92,7 @@ const Navbar = () => {
                         <a
                             href="#Home"
                             onClick={(e) => scrollToSection(e, "#Home")}
-                            className="text-xl font-bold bg-gradient-to-r from-[#a855f7] to-[#6366f1] bg-clip-text text-transparent"
+                            className="text-xl font-bold bg-gradient-to-r from-[#a855f7] to-[#6366f1] bg-clip-text text-transparent hover:opacity-90 transition-opacity"
                         >
                             Farrel
                         </a>
@@ -90,32 +100,36 @@ const Navbar = () => {
         
                     {/* Desktop Navigation */}
                     <div className="hidden md:block">
-                        <div className="ml-8 flex items-center space-x-8">
-                            {navItems.map((item) => (
-                                <a
-                                    key={item.label}
-                                    href={item.href}
-                                    onClick={(e) => scrollToSection(e, item.href)}
-                                    className="group relative px-1 py-2 text-sm font-medium"
-                                >
-                                    <span
-                                        className={`relative z-10 transition-colors duration-300 ${
-                                            activeSection === item.href.substring(1)
-                                                ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent font-semibold"
-                                                : "text-[#e2d3fd] group-hover:text-white"
-                                        }`}
+                        <div className="ml-8 flex items-center md:space-x-6 lg:space-x-8">
+                            {navItems.map((item) => {
+                                const sectionId = item.href.substring(1);
+                                const isActive = activeSection === sectionId;
+                                return (
+                                    <a
+                                        key={item.label}
+                                        href={item.href}
+                                        onClick={(e) => scrollToSection(e, item.href)}
+                                        className="group relative px-1 py-2 text-sm font-medium transition-colors"
                                     >
-                                        {item.label}
-                                    </span>
-                                    <span
-                                        className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#6366f1] to-[#a855f7] transform origin-left transition-transform duration-300 ${
-                                            activeSection === item.href.substring(1)
-                                                ? "scale-x-100"
-                                                : "scale-x-0 group-hover:scale-x-100"
-                                        }`}
-                                    />
-                                </a>
-                            ))}
+                                        <span
+                                            className={`relative z-10 transition-all duration-300 ${
+                                                isActive
+                                                    ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent font-semibold"
+                                                    : "text-[#e2d3fd] group-hover:text-white"
+                                            }`}
+                                        >
+                                            {item.label}
+                                        </span>
+                                        <span
+                                            className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#6366f1] to-[#a855f7] transform origin-left transition-transform duration-300 rounded-full ${
+                                                isActive
+                                                    ? "scale-x-100"
+                                                    : "scale-x-0 group-hover:scale-x-100"
+                                            }`}
+                                        />
+                                    </a>
+                                );
+                            })}
                         </div>
                     </div>
         
@@ -123,8 +137,9 @@ const Navbar = () => {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
+                            aria-label="Toggle navigation menu"
                             className={`relative p-2 text-[#e2d3fd] hover:text-white transition-transform duration-300 ease-in-out transform ${
-                                isOpen ? "rotate-90 scale-125" : "rotate-0 scale-100"
+                                isOpen ? "rotate-90 scale-110" : "rotate-0 scale-100"
                             }`}
                         >
                             {isOpen ? (
@@ -145,26 +160,38 @@ const Navbar = () => {
                         : "max-h-0 opacity-0 overflow-hidden"
                 }`}
             >
-                <div className="px-4 py-6 space-y-4">
-                    {navItems.map((item, index) => (
-                        <a
-                            key={item.label}
-                            href={item.href}
-                            onClick={(e) => scrollToSection(e, item.href)}
-                            className={`block px-4 py-3 text-lg font-medium transition-all duration-300 ease ${
-                                activeSection === item.href.substring(1)
-                                    ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent font-semibold"
-                                    : "text-[#e2d3fd] hover:text-white"
-                            }`}
-                            style={{
-                                transitionDelay: `${index * 100}ms`,
-                                transform: isOpen ? "translateX(0)" : "translateX(50px)",
-                                opacity: isOpen ? 1 : 0,
-                            }}
-                        >
-                            {item.label}
-                        </a>
-                    ))}
+                <div className="px-5 py-6 space-y-2 bg-[#030014]/95 backdrop-blur-2xl border-b border-white/10 shadow-2xl">
+                    {navItems.map((item, index) => {
+                        const sectionId = item.href.substring(1);
+                        const isActive = activeSection === sectionId;
+                        return (
+                            <a
+                                key={item.label}
+                                href={item.href}
+                                onClick={(e) => scrollToSection(e, item.href)}
+                                className={`block px-4 py-3 rounded-xl text-base font-medium transition-all duration-300 ease ${
+                                    isActive
+                                        ? "bg-gradient-to-r from-[#6366f1]/20 to-[#a855f7]/20 border border-[#6366f1]/40 text-white font-semibold"
+                                        : "text-[#e2d3fd] hover:text-white hover:bg-white/5 border border-transparent"
+                                }`}
+                                style={{
+                                    transitionDelay: `${index * 40}ms`,
+                                    transform: isOpen ? "translateX(0)" : "translateX(20px)",
+                                    opacity: isOpen ? 1 : 0,
+                                }}
+                            >
+                                <span
+                                    className={
+                                        isActive
+                                            ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent"
+                                            : ""
+                                    }
+                                >
+                                    {item.label}
+                                </span>
+                            </a>
+                        );
+                    })}
                 </div>
             </div>
         </nav>
